@@ -7,14 +7,14 @@ Pipeline untuk preprocessing dataset klasifikasi gambar:
 - Bangun pipeline tf.data untuk training, validasi, dan pengujian
 """
 
-from scripts.preprocessing.data_loader import (
+from preprocessing.data_loader import (
     load_image_paths_and_labels,
     encode_labels,
     split_dataset,
     compute_and_save_class_weights,
 )
 
-from scripts.preprocessing.dataset_builder import build_dataset
+from preprocessing.dataset_builder import build_dataset
 
 
 # Langkah 1: Load paths dan label

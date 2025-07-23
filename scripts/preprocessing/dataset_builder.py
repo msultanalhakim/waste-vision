@@ -18,9 +18,9 @@ def preprocess_image(path, label):
     Returns:
         tuple: (image_tensor, label)
     """
-    image = tf.io.read_file(path)
-    image = tf.image.decode_jpeg(image, channels=3)
-    image = tf.image.resize(image, IMAGE_SIZE)
+    image = tf.io.read_file(path) # Membaca file gambar sebagai byte string
+    image = tf.image.decode_jpeg(image, channels=3) # Mendekode gambar JPEG menjadi tensor RGB
+    image = tf.image.resize(image, IMAGE_SIZE) # Meresize gambar ke ukuran standar
     image = tf.cast(image, tf.float32) / 255.0  # Normalisasi ke [0,1]
     return image, label
 
@@ -39,9 +39,9 @@ def data_augmentation(image, label):
     Returns:
         tuple: (augmented_image_tensor, label)
     """
-    image = tf.image.random_flip_left_right(image)
-    image = tf.image.random_brightness(image, max_delta=0.1)
-    image = tf.image.random_contrast(image, lower=0.9, upper=1.1)
+    image = tf.image.random_flip_left_right(image) # Flip horizontal acak
+    image = tf.image.random_brightness(image, max_delta=0.1) # Penyesuaian brightness acak
+    image = tf.image.random_contrast(image, lower=0.9, upper=1.1) # Penyesuaian contrast acak
     return image, label
 
 def build_dataset(paths, labels, training=True):
@@ -62,14 +62,14 @@ def build_dataset(paths, labels, training=True):
     Returns:
         tf.data.Dataset: Dataset siap dilatih/divalidasi.
     """
-    ds = tf.data.Dataset.from_tensor_slices((paths, labels))
-    ds = ds.map(preprocess_image, num_parallel_calls=tf.data.AUTOTUNE)
+    ds = tf.data.Dataset.from_tensor_slices((paths, labels)) # Membuat dataset dari path dan label
+    ds = ds.map(preprocess_image, num_parallel_calls=tf.data.AUTOTUNE) # Preprocessing gambar secara paralel
     
     if training:
         ds = ds.shuffle(buffer_size=1024)  # Agar batch tidak overfit urutan
-        ds = ds.map(data_augmentation, num_parallel_calls=tf.data.AUTOTUNE)
+        ds = ds.map(data_augmentation, num_parallel_calls=tf.data.AUTOTUNE) # Augmentasi data jika training
     
-    ds = ds.batch(BATCH_SIZE)
+    ds = ds.batch(BATCH_SIZE) # Membuat batch dari dataset
     ds = ds.prefetch(tf.data.AUTOTUNE)  # Pipeline non-blocking
     
     return ds
